@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1deb1
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jul 21, 2025 at 12:33 PM
--- Server version: 10.11.9-MariaDB-0+deb12u1
--- PHP Version: 8.2.26
+-- Host: 127.0.0.1
+-- Generation Time: May 11, 2026 at 10:40 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,106 @@ SET time_zone = "+00:00";
 --
 -- Database: `crud_db`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_logs`
+--
+
+CREATE TABLE `admin_logs` (
+  `log_id` int(11) NOT NULL,
+  `admin_id` int(11) NOT NULL,
+  `action` varchar(100) NOT NULL,
+  `booking_id` int(11) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_logs`
+--
+
+INSERT INTO `admin_logs` (`log_id`, `admin_id`, `action`, `booking_id`, `details`, `created_at`) VALUES
+(1, 2, 'confirm_booking', 2, 'Booking confirmed with payment method: cash', '2026-05-09 04:41:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bookings`
+--
+
+CREATE TABLE `bookings` (
+  `booking_id` int(11) NOT NULL,
+  `booking_reference` varchar(50) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `cottage_id` int(11) NOT NULL,
+  `customer_name` varchar(100) NOT NULL,
+  `customer_email` varchar(100) NOT NULL,
+  `customer_phone` varchar(20) NOT NULL,
+  `booking_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `total_days` int(11) NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `status` enum('pending','confirmed','cancelled','completed') DEFAULT 'pending',
+  `payment_status` enum('unpaid','paid','refunded') DEFAULT 'unpaid',
+  `special_requests` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `admin_notes` text DEFAULT NULL,
+  `payment_method` enum('cash','gcash','bank_transfer') DEFAULT 'cash',
+  `payment_reference` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bookings`
+--
+
+INSERT INTO `bookings` (`booking_id`, `booking_reference`, `user_id`, `cottage_id`, `customer_name`, `customer_email`, `customer_phone`, `booking_date`, `start_time`, `end_time`, `total_days`, `total_amount`, `status`, `payment_status`, `special_requests`, `created_at`, `approved_by`, `approved_at`, `admin_notes`, `payment_method`, `payment_reference`) VALUES
+(1, 'RES202605083808', 1, 1, 'loveee', 'love@gmail.com', '091966100271', '2026-05-10', '10:37:00', '22:37:00', 12, 6000.00, 'pending', 'unpaid', '', '2026-05-08 14:37:50', NULL, NULL, NULL, 'cash', NULL),
+(2, 'RES202605093821', 1, 13, 'loveee', 'love@gmail.com', '091966100271', '2026-05-11', '09:00:00', '18:00:00', 2, 5000.00, 'confirmed', 'unpaid', '', '2026-05-09 04:24:34', 2, '2026-05-09 04:41:55', '', 'cash', ''),
+(3, 'RES202605098499', 2, 13, 'Winnie Resort Manager', 'admin@winniesresort.com', '09123456789', '2026-05-21', '09:00:00', '18:00:00', 2, 5000.00, 'pending', 'unpaid', '', '2026-05-09 09:10:20', NULL, NULL, NULL, 'cash', NULL),
+(4, 'RES202605106492', 3, 1, 'loveee', 'loveee@gmail.com', '12345678901', '2026-05-11', '09:00:00', '18:00:00', 2, 6000.00, 'pending', 'unpaid', '', '2026-05-10 13:16:15', NULL, NULL, NULL, 'cash', NULL),
+(5, 'RES202605119771', 1, 4, 'loveee', 'love@gmail.com', '091966100271', '2026-05-12', '09:00:00', '18:00:00', 1, 15000.00, 'pending', 'unpaid', '', '2026-05-11 07:04:23', NULL, NULL, NULL, 'cash', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cottages`
+--
+
+CREATE TABLE `cottages` (
+  `cottage_id` int(11) NOT NULL,
+  `cottage_name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `price_per_day` decimal(10,2) NOT NULL,
+  `capacity` int(11) DEFAULT 2,
+  `image` varchar(255) DEFAULT NULL,
+  `status` enum('available','maintenance') DEFAULT 'available',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cottages`
+--
+
+INSERT INTO `cottages` (`cottage_id`, `cottage_name`, `description`, `price_per_day`, `capacity`, `image`, `status`, `created_at`) VALUES
+(1, '🌊 Beach Front Kubo', 'Traditional nipa hut with stunning ocean view. Perfect for couples and small families. Includes electric fan and comfortable seating.', 3000.00, 4, NULL, 'available', '2026-05-08 10:18:58'),
+(2, '🏠 Family Villa', 'Spacious villa perfect for family gatherings. Features air conditioning, private bathroom, kitchenette, and private pool access.', 8000.00, 10, NULL, 'available', '2026-05-08 10:18:58'),
+(3, '💑 Couple\'s Paradise', 'Cozy romantic hut with beach front view. Includes king size bed, air conditioning, and private veranda.', 5000.00, 2, NULL, 'available', '2026-05-08 10:18:58'),
+(4, '🎉 Function Hall', 'Airconditioned grand hall perfect for events, parties, and weddings. Capacity up to 30 people. Includes sound system.', 15000.00, 30, NULL, 'available', '2026-05-08 10:18:58'),
+(5, '⭐ Deluxe Suite', 'Modern luxury suite with AC, 50\" TV, mini bar, private bathroom with hot shower, and ocean view balcony.', 7000.00, 2, NULL, 'available', '2026-05-08 10:18:58'),
+(6, '🏖️ Premium Beach House', 'Luxury beach house with direct beach access. Features 2 bedrooms, living room, kitchen, and private garden.', 12000.00, 6, NULL, 'available', '2026-05-08 10:18:58'),
+(7, '🌊 Beach Front Kubo', 'Traditional nipa hut with stunning ocean view. Perfect for couples and small families. Includes electric fan and comfortable seating.', 3000.00, 4, NULL, 'available', '2026-05-08 10:19:12'),
+(8, '🏠 Family Villa', 'Spacious villa perfect for family gatherings. Features air conditioning, private bathroom, kitchenette, and private pool access.', 8000.00, 10, NULL, 'available', '2026-05-08 10:19:12'),
+(9, '💑 Couple\'s Paradise', 'Cozy romantic hut with beach front view. Includes king size bed, air conditioning, and private veranda.', 5000.00, 2, NULL, 'available', '2026-05-08 10:19:12'),
+(10, '🎉 Function Hall', 'Airconditioned grand hall perfect for events, parties, and weddings. Capacity up to 30 people. Includes sound system.', 15000.00, 30, NULL, 'available', '2026-05-08 10:19:12'),
+(11, '⭐ Deluxe Suite', 'Modern luxury suite with AC, 50\" TV, mini bar, private bathroom with hot shower, and ocean view balcony.', 7000.00, 2, NULL, 'available', '2026-05-08 10:19:12'),
+(12, '🏖️ Premium Beach House', 'Luxury beach house with direct beach access. Features 2 bedrooms, living room, kitchen, and private garden.', 12000.00, 6, NULL, 'available', '2026-05-08 10:19:12'),
+(13, 'Standard Room', 'Basic room with fan and private bathroom', 2500.00, 2, NULL, 'available', '2026-05-09 04:18:50'),
+(14, 'Superior Room', 'Spacious room with AC and hot shower', 4500.00, 4, NULL, 'available', '2026-05-09 04:18:50');
 
 -- --------------------------------------------------------
 
@@ -40,7 +140,8 @@ CREATE TABLE `login_attempts` (
 --
 
 INSERT INTO `login_attempts` (`id`, `email`, `ip_address`, `attempt_time`, `user_agent`) VALUES
-(36, 'glennazuelo1@gmail.com', '::142432432', '2025-04-15 13:15:00', '');
+(36, 'glennazuelo1@gmail.com', '::142432432', '2025-04-15 13:15:00', ''),
+(0, 'glennazuelo1@gmail.com', '::1', '2026-05-08 08:59:30', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0');
 
 -- --------------------------------------------------------
 
@@ -86,50 +187,57 @@ INSERT INTO `tbl_logs` (`LOGID`, `USERID`, `ACTION`, `DATELOG`, `TIMELOG`, `user
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `uuid` char(36) DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` varchar(100) DEFAULT 'user',
-  `status` varchar(100) DEFAULT NULL,
-  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(100) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `deleted_at` timestamp NULL DEFAULT NULL
+  `role` enum('admin','customer') DEFAULT 'customer',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `uuid`, `email`, `password`, `role`, `status`, `name`, `phone`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, NULL, 'glennazuelo1@gmail.com', '$2y$10$aitqcz/yYmTPfmMGbMbnXuGEdwNG63RI1qbTF9IM0cg5SrUg4P/iu', 'User', 'Active', 'Glenn Azuelo', '09125110476', '2025-04-17 13:31:01', '2025-07-21 04:18:03', '2025-07-21 04:18:03'),
-(9, NULL, 'glennazuelo1@gmail.comd', '$2y$10$Xv57FAvSxnip8apDXF3rmutrLIESHcAHYVzQMKgMf2tu6GknL4Plm', 'Admin', 'Active', 'Glenn Azuelo', '09125110476', '2025-05-24 07:00:28', '2025-05-23 23:00:28', '2025-05-23 23:00:28'),
-(10, NULL, 'glennazuelo1@gmail.com1', '$2y$10$PxNNhaa76.SAbFFelJU9xOZRajcVMCZkeToZ09l1FR5ll13saXu4q', 'Admin', 'Active', 'Cherry Ann Grandia', '09125110476', '2025-05-24 07:00:50', '2025-07-21 04:19:17', '2025-07-21 04:19:17');
+INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `full_name`, `phone`, `role`, `created_at`) VALUES
+(1, 'love', '25f9e794323b453885f5181f1b624d0b', 'love@gmail.com', 'loveee', '091966100271', 'customer', '2026-05-08 14:37:11'),
+(2, 'admin', '0192023a7bbd73250516f069df18b500', 'admin@winniesresort.com', 'Winnie Resort Manager', '09123456789', 'admin', '2026-05-09 04:35:31'),
+(3, 'loveee', '25f9e794323b453885f5181f1b624d0b', 'loveee@gmail.com', 'loveee', '12345678901', 'customer', '2026-05-10 13:05:49');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `login_attempts`
+-- Indexes for table `admin_logs`
 --
-ALTER TABLE `login_attempts`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `admin_logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `admin_id` (`admin_id`);
 
 --
--- Indexes for table `tbl_logs`
+-- Indexes for table `bookings`
 --
-ALTER TABLE `tbl_logs`
-  ADD PRIMARY KEY (`LOGID`),
-  ADD KEY `USERID` (`USERID`);
+ALTER TABLE `bookings`
+  ADD PRIMARY KEY (`booking_id`),
+  ADD UNIQUE KEY `booking_reference` (`booking_reference`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `cottage_id` (`cottage_id`);
+
+--
+-- Indexes for table `cottages`
+--
+ALTER TABLE `cottages`
+  ADD PRIMARY KEY (`cottage_id`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -137,22 +245,45 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `login_attempts`
+-- AUTO_INCREMENT for table `admin_logs`
 --
-ALTER TABLE `login_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+ALTER TABLE `admin_logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `tbl_logs`
+-- AUTO_INCREMENT for table `bookings`
 --
-ALTER TABLE `tbl_logs`
-  MODIFY `LOGID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+ALTER TABLE `bookings`
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `cottages`
+--
+ALTER TABLE `cottages`
+  MODIFY `cottage_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `admin_logs`
+--
+ALTER TABLE `admin_logs`
+  ADD CONSTRAINT `admin_logs_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `bookings`
+--
+ALTER TABLE `bookings`
+  ADD CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`cottage_id`) REFERENCES `cottages` (`cottage_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

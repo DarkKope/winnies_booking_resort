@@ -7,29 +7,44 @@ use CodeIgniter\Model;
 class UserModel extends Model
 {
     protected $table = 'users';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'user_id';
+    protected $allowedFields = ['username', 'password', 'email', 'full_name', 'phone', 'role'];
+    protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = false;
+    protected $skipValidation = true;
 
-    protected $allowedFields = ['uuid','email', 'password','role','status','name','phone', 'created_at', 'updated_at', 'deleted_at'];
-
-    public function getRecords($start, $length, $searchValue = '')
+    public function login($username, $password)
     {
-        $builder = $this->builder();
-        $builder->select('*');
+        return $this->where('username', $username)
+                    ->where('password', $password)
+                    ->first();
+    }
 
-        if (!empty($searchValue)) {
-            $builder->groupStart()
-                ->like('email', $searchValue)
-                ->orLike('name', $searchValue)
-                ->groupEnd();
-        }
+    public function register($data)
+    {
+        return $this->insert($data);
+    }
 
-        // Clone builder for filtered count before applying limit
-        $filteredBuilder = clone $builder;
-        $filteredRecords = $filteredBuilder->countAllResults();
-
-        $builder->limit($length, $start);
-        $data = $builder->get()->getResultArray();
-
-        return ['data' => $data, 'filtered' => $filteredRecords];
+    public function countAll()
+    {
+        return $this->countAllResults();
+    }
+    
+    // Fix for bind error - use simple query
+    public function getUserByUsername($username)
+    {
+        $builder = $this->db->table('users');
+        $builder->where('username', $username);
+        $query = $builder->get();
+        return $query->getRowArray();
+    }
+    
+    public function getUserByEmail($email)
+    {
+        $builder = $this->db->table('users');
+        $builder->where('email', $email);
+        $query = $builder->get();
+        return $query->getRowArray();
     }
 }
